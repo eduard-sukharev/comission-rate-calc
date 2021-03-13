@@ -6,12 +6,17 @@ namespace App\Model;
 class TransactionsHistory implements \IteratorAggregate
 {
     /**
-     * @var Transaction
+     * @var Transaction[]
      */
     private $transactions;
 
     public function getIterator()
     {
         return new \ArrayIterator($this->transactions);
+    }
+
+    public function add(Transaction $transaction)
+    {
+        $this->transactions[] = $transaction;
     }
 }

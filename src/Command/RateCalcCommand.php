@@ -5,14 +5,12 @@ namespace App\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 class RateCalcCommand extends Command
 {
     protected static $defaultName = 'rate:calc';
-    protected static $defaultDescription = 'Calculate comission rate for transactions in CSV';
+    protected static $defaultDescription = 'Calculate commission rate for transactions in CSV';
 
     protected function configure()
     {
