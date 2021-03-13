@@ -10,9 +10,9 @@ use Money\Money;
 
 class FixedFeeStrategy implements StrategyInterface
 {
-    private $feeRate;
+    private float $feeRate;
 
-    public function __construct($feePercent)
+    public function __construct(float $feePercent)
     {
         $this->feeRate = $feePercent;
     }

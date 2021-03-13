@@ -25,4 +25,27 @@ class TransactionsHistory implements \IteratorAggregate
     {
         $this->transactions[(new Client())->produce($size = 32)] = $transaction;
     }
+
+    public function getSameWeekTransactions(\DateTimeImmutable $dateTime): self
+    {
+        $history = new self();
+        $mondayTimestamp = strtotime('monday this week', $dateTime->getTimestamp());
+        foreach ($this->transactions as $tx) {
+            if ($tx->getDate()->getTimestamp() > $mondayTimestamp) {
+                $history->add($tx);
+            }
+        }
+        return $history;
+    }
+
+    public function getTransactionsUpToDate(\DateTimeImmutable $dateTime): self
+    {
+        $history = new self();
+        foreach ($this->transactions as $tx) {
+            if ($tx->getDate()->getTimestamp() < $dateTime->getTimestamp()) {
+                $history->add($tx);
+            }
+        }
+        return $history;
+    }
 }

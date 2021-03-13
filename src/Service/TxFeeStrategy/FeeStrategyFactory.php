@@ -17,6 +17,9 @@ class FeeStrategyFactory
             if ($tx->isClientBusiness()) {
                 return new FixedFeeStrategy(0.5);
             }
+            if ($tx->isClientPrivate()) {
+                return new WeeklyThresholdFeeStrategy(0.3, );
+            }
         }
 
         // No defined rule found, assume no fee
