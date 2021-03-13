@@ -1,0 +1,5 @@
+florianv_swap:
+    providers:
+        exchange_rates_api: ~              # exchangeratesapi.io
+    cache:
+        ttl: 3600 # seconds
