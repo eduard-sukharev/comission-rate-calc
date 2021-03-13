@@ -10,6 +10,9 @@ class TransactionsHistory implements \IteratorAggregate
      */
     private $transactions;
 
+    /**
+     * @return Transaction[]
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->transactions);

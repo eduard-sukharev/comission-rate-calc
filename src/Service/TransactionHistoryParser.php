@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Service;
@@ -6,6 +7,8 @@ namespace App\Service;
 use App\Model\Transaction;
 use App\Model\TransactionsHistory;
 use App\Service\FileParser\FileParserInterface;
+use Money\Currency;
+use Money\Money;
 
 class TransactionHistoryParser
 {
@@ -26,13 +29,14 @@ class TransactionHistoryParser
         $rows = $this->fileParser->parse($transactionsfilename);
         $history = new TransactionsHistory();
         foreach ($rows as $row) {
-            $history->add((new Transaction())
-                ->setDate(new \DateTimeImmutable($row[self::ROW_OFFSET_DATE]))
-                ->setClientId((int) $row[self::ROW_OFFSET_CLIENT_ID])
-                ->setClientType($row[self::ROW_OFFSET_CLIENT_TYPE])
-                ->setType($row[self::ROW_OFFSET_TRANSACTION_TYPE])
-                ->setAmount($row[self::ROW_OFFSET_AMOUNT])
-                ->setCurrency($row[self::ROW_OFFSET_CURRENCY]));
+            $history->add(
+                (new Transaction())
+                    ->setDate(new \DateTimeImmutable($row[self::ROW_OFFSET_DATE]))
+                    ->setClientId((int) $row[self::ROW_OFFSET_CLIENT_ID])
+                    ->setClientType($row[self::ROW_OFFSET_CLIENT_TYPE])
+                    ->setType($row[self::ROW_OFFSET_TRANSACTION_TYPE])
+                    ->setMonetaryValue(new Money($row[self::ROW_OFFSET_AMOUNT], new Currency($row[self::ROW_OFFSET_CURRENCY])))
+            );
         }
 
         return $history;

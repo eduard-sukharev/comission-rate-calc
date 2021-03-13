@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use Money\Money;
+
 class Transaction
 {
-    private $date;
-    private $clientId;
-    private $clientType;
-    private $type;
-    private $amount;
-    private $currency;
+    private \DateTimeImmutable $date;
+    private int $clientId;
+    private string $clientType;
+    private string $type;
+    private Money $monetaryValue;
 
     public function getDate(): \DateTimeImmutable
     {
@@ -56,25 +57,14 @@ class Transaction
         return $this;
     }
 
-    public function getAmount(): string
+    public function setMonetaryValue(Money $monetaryValue): self
     {
-        return $this->amount;
-    }
-
-    public function setAmount(string $amount): self
-    {
-        $this->amount = $amount;
+        $this->monetaryValue = $monetaryValue;
         return $this;
     }
 
-    public function getCurrency(): string
+    public function getMonetaryValue(): Money
     {
-        return $this->currency;
-    }
-
-    public function setCurrency(string $currency): self
-    {
-        $this->currency = $currency;
-        return $this;
+        return $this->monetaryValue;
     }
 }

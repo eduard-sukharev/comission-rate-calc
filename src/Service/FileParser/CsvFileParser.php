@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service\FileParser;
 
-class CsvFileParser
+class CsvFileParser implements FileParserInterface
 {
     public function parse(string $filename): array
     {
