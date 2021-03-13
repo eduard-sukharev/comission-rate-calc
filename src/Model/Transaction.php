@@ -8,6 +8,11 @@ use Money\Money;
 
 class Transaction
 {
+    private const TX_TYPE_DEPOSIT = 'deposit';
+    private const TX_TYPE_WITHDRAW = 'withdraw';
+    private const CLIENT_TYPE_PRIVATE = 'private';
+    private const CLIENT_TYPE_BUSINESS = 'business';
+
     private \DateTimeImmutable $date;
     private int $clientId;
     private string $clientType;
@@ -37,9 +42,14 @@ class Transaction
         return $this;
     }
 
-    public function getClientType(): string
+    public function isClientPrivate(): bool
     {
-        return $this->clientType;
+        return $this->clientType === self::CLIENT_TYPE_PRIVATE;
+    }
+
+    public function isClientBusiness(): bool
+    {
+        return $this->clientType === self::CLIENT_TYPE_BUSINESS;
     }
 
     public function setClientType($clientType): self
@@ -48,15 +58,20 @@ class Transaction
         return $this;
     }
 
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
     public function setType(string $type): self
     {
         $this->type = $type;
         return $this;
+    }
+
+    public function isDeposit(): bool
+    {
+        return $this->type === self::TX_TYPE_DEPOSIT;
+    }
+
+    public function isWithdraw(): bool
+    {
+        return $this->type === self::TX_TYPE_WITHDRAW;
     }
 
     public function setValue(Money $value): self

@@ -59,22 +59,36 @@ class RateCalcCommandTest extends KernelTestCase
         $commandTester->execute(['transactions_file' => $filename]);
 
         $output = $commandTester->getDisplay();
-        $expectedOutput = <<<OUTPUT
-0.60
-3.00
-0.00
-0.06
-1.50
-0
-0.70
-0.30
-0.30
-3.00
-0.00
-0.00
-8612
+        $expectedLines = [
+            '0.60',
+            '3.00',
+            '0.00',
+            '0.06',
+            '1.50',
+            '0',
+            '0.70',
+            '0.30',
+            '0.30',
+            '3.00',
+            '0.00',
+            '0.00',
+            '8612',
+        ];
+        $actualLines = array_filter($this->splitByLines($output), fn($line) => $line !== '');
+        var_dump($actualLines);
+        self::assertCount(count($expectedLines), $actualLines);
+        foreach ($actualLines as $i => $actualLine) {
+            echo $actualLine . PHP_EOL;
+            self::assertEquals($expectedLines[$i], $actualLine);
+        }
+    }
 
-OUTPUT;
-        self::assertEquals($expectedOutput, $output);
+    /**
+     * @param string $output
+     * @return string[]
+     */
+    protected function splitByLines(string $output)
+    {
+        return explode("\n", $output);
     }
 }

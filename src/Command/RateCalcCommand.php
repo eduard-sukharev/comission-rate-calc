@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Service\TxFeeCalculator;
 use App\Service\TxHistoryParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,15 +13,14 @@ class RateCalcCommand extends Command
 {
     protected static $defaultName = 'rate:calc';
     protected static $defaultDescription = 'Calculate commission rate for transactions in CSV';
-    /**
-     * @var TxHistoryParser
-     */
     private $txHistoryParser;
+    private $txFeeCalculator;
 
-    public function __construct(TxHistoryParser $transactionHistoryParser)
+    public function __construct(TxHistoryParser $txHistoryParser, TxFeeCalculator $txFeeCalculator)
     {
         parent::__construct();
-        $this->txHistoryParser = $transactionHistoryParser;
+        $this->txHistoryParser = $txHistoryParser;
+        $this->txFeeCalculator = $txFeeCalculator;
     }
 
     protected function configure()
@@ -35,23 +35,15 @@ class RateCalcCommand extends Command
     {
         $fileName = $input->getArgument('transactions_file');
         $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
+        $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);
         foreach ($transactionsHistory as $transaction) {
-            $output->writeln($transaction->getFee() ? $transaction->getFee()->getAmount() : 'undefined');
+            $output->writeln(
+                $transaction->getFee()
+                    ? ($transaction->getFee()->getAmount() ? sprintf('%.2F', $transaction->getFee()->getAmount()) : '0')
+                    : 'undefined'
+            );
         }
 
-        $output->writeln('0.60');
-        $output->writeln('3.00');
-        $output->writeln('0.00');
-        $output->writeln('0.06');
-        $output->writeln('1.50');
-        $output->writeln('0');
-        $output->writeln('0.70');
-        $output->writeln('0.30');
-        $output->writeln('0.30');
-        $output->writeln('3.00');
-        $output->writeln('0.00');
-        $output->writeln('0.00');
-        $output->writeln('8612');
         return Command::SUCCESS;
     }
 }
