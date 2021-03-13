@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Service;
@@ -9,8 +10,6 @@ class TxFeeCalculator
 {
     public function calculateTxFees(TransactionsHistory $history): TransactionsHistory
     {
-
-
         return $history;
     }
 }
