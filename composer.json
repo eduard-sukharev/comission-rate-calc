@@ -7,6 +7,7 @@
         "php": ">=7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "better/nanoid": "^0.0.1",
         "florianv/swap-bundle": "^5.1",
         "mockery/mockery": "^1.4",
         "moneyphp/money": "^3.3",

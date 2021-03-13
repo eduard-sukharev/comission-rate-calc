@@ -10,7 +10,7 @@ use App\Service\FileParser\FileParserInterface;
 use Money\Currency;
 use Money\Money;
 
-class TransactionHistoryParser
+class TxHistoryParser
 {
     private const ROW_OFFSET_DATE = 0;
     private const ROW_OFFSET_CLIENT_ID = 1;
@@ -35,7 +35,7 @@ class TransactionHistoryParser
                     ->setClientId((int) $row[self::ROW_OFFSET_CLIENT_ID])
                     ->setClientType($row[self::ROW_OFFSET_CLIENT_TYPE])
                     ->setType($row[self::ROW_OFFSET_TRANSACTION_TYPE])
-                    ->setMonetaryValue(new Money($row[self::ROW_OFFSET_AMOUNT], new Currency($row[self::ROW_OFFSET_CURRENCY])))
+                    ->setValue(new Money($row[self::ROW_OFFSET_AMOUNT], new Currency($row[self::ROW_OFFSET_CURRENCY])))
             );
         }
 

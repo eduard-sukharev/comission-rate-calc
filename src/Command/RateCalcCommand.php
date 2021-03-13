@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Service\TransactionHistoryParser;
+use App\Service\TxHistoryParser;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,14 +13,14 @@ class RateCalcCommand extends Command
     protected static $defaultName = 'rate:calc';
     protected static $defaultDescription = 'Calculate commission rate for transactions in CSV';
     /**
-     * @var TransactionHistoryParser
+     * @var TxHistoryParser
      */
-    private $transactionHistoryParser;
+    private $txHistoryParser;
 
-    public function __construct(TransactionHistoryParser $transactionHistoryParser)
+    public function __construct(TxHistoryParser $transactionHistoryParser)
     {
         parent::__construct();
-        $this->transactionHistoryParser = $transactionHistoryParser;
+        $this->txHistoryParser = $transactionHistoryParser;
     }
 
     protected function configure()
@@ -34,9 +34,9 @@ class RateCalcCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $fileName = $input->getArgument('transactions_file');
-        $transactionsHistory = $this->transactionHistoryParser->getTransactionsHistory($fileName);
+        $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
         foreach ($transactionsHistory as $transaction) {
-            $output->writeln($transaction->getMonetaryValue()->getAmount());
+            $output->writeln($transaction->getFee() ? $transaction->getFee()->getAmount() : 'undefined');
         }
 
         $output->writeln('0.60');

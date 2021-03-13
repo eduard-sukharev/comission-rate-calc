@@ -4,8 +4,61 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6239ec7049e94168854faae7627b0394",
+    "content-hash": "bfe20b12bcf3a37c84f6a79fe1e00a08",
     "packages": [
+        {
+            "name": "better/nanoid",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Microtribute/better-nanoid.git",
+                "reference": "f2e6e664a8680f640ac953555a1f4943f98802c1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Microtribute/better-nanoid/zipball/f2e6e664a8680f640ac953555a1f4943f98802c1",
+                "reference": "f2e6e664a8680f640ac953555a1f4943f98802c1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Better\\Nanoid\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Microtribute",
+                    "email": "microtibute@github.io",
+                    "homepage": "https://github.com/Microtribute",
+                    "role": "Author"
+                }
+            ],
+            "description": "A copy of nanoid in PHP",
+            "homepage": "https://github.com/Microtribute/better-nanoid",
+            "keywords": [
+                "better",
+                "nanoid",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/Microtribute/better-nanoid/issues",
+                "source": "https://github.com/Microtribute/better-nanoid/tree/0.0.1"
+            },
+            "time": "2020-09-21T15:29:25+00:00"
+        },
         {
             "name": "clue/stream-filter",
             "version": "v1.5.0",
@@ -6826,7 +6879,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7.2.5",
+        "php": ">=7.4",
         "ext-ctype": "*",
         "ext-iconv": "*"
     },

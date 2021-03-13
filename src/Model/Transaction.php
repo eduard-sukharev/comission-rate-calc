@@ -11,7 +11,8 @@ class Transaction
     private int $clientId;
     private string $clientType;
     private string $type;
-    private Money $monetaryValue;
+    private Money $value;
+    private ?Money $fee = null;
 
     public function getDate(): \DateTimeImmutable
     {
@@ -57,14 +58,25 @@ class Transaction
         return $this;
     }
 
-    public function setMonetaryValue(Money $monetaryValue): self
+    public function setValue(Money $value): self
     {
-        $this->monetaryValue = $monetaryValue;
+        $this->value = $value;
         return $this;
     }
 
-    public function getMonetaryValue(): Money
+    public function getValue(): Money
     {
-        return $this->monetaryValue;
+        return $this->value;
+    }
+
+    public function getFee(): ?Money
+    {
+        return $this->fee;
+    }
+
+    public function setFee(Money $fee): self
+    {
+        $this->fee = $fee;
+        return $this;
     }
 }
