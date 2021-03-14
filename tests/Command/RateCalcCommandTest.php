@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Command;
 
+use Exchanger\CurrencyPair;
+use Exchanger\ExchangeRate;
+use Mockery;
+use Money\Currency;
+use Money\Exception\UnresolvableCurrencyPairException;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -22,12 +27,10 @@ class RateCalcCommandTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        $kernel = static::createKernel();
-        $kernel->boot();
-        $application = new Application($kernel);
-//        $swap = $kernel->getContainer()->get('florianv_swap.swap');
-//        var_dump($swap);
+        self::bootKernel();
+        self::$kernel->getContainer();
 
+        $application = new Application(self::$kernel);
         $this->file = tmpfile();
         $this->command = $application->find('rate:calc');
     }
@@ -58,6 +61,22 @@ class RateCalcCommandTest extends KernelTestCase
             fputcsv($this->file, $row);
         }
         $filename = stream_get_meta_data($this->file)['uri'];
+
+        /** @var Mockery\MockInterface $swap */
+        $swap = self::$container->get('Swap\Swap');
+        $swap->shouldReceive('historical')->andReturnUsing(function ($pair, $date) {
+            $rates = ['EUR/USD' => 1.1469, 'EUR/JPY' => 129.53];
+            [$baseCode, $counterCode] = explode('/', $pair);
+            if (!isset($rates[$pair])) {
+                throw UnresolvableCurrencyPairException::createFromCurrencies(
+                    new Currency($baseCode),
+                    new Currency($counterCode)
+                );
+            }
+
+            return new ExchangeRate(new CurrencyPair($baseCode, $counterCode), $rates[$pair], new \DateTime(), 'fake');
+        });
+
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(['transactions_file' => $filename]);
 

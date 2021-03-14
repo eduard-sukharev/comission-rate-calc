@@ -5,24 +5,18 @@ declare(strict_types=1);
 namespace App\Service\TxFeeStrategy;
 
 use App\Model\Transaction;
-use Exchanger\Exception\Exception as ExchangerException;
+use App\Service\ExchangeConverter;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
-use Money\CurrencyPair;
-use Money\Exception\UnresolvableCurrencyPairException;
 use Money\Money;
-use Swap\Swap;
 
 class FeeStrategyFactory
 {
-    /**
-     * @var Swap
-     */
-    private Swap $swap;
+    private ExchangeConverter $exchangeConverter;
 
-    public function __construct(Swap $swap)
+    public function __construct(ExchangeConverter $exchangeConverter)
     {
-        $this->swap = $swap;
+        $this->exchangeConverter = $exchangeConverter;
     }
 
     public function createStrategy(Transaction $tx)
@@ -42,7 +36,7 @@ class FeeStrategyFactory
                     0.3,
                     new Money(1000 * $currencyScale, $currency),
                     3,
-                    $this->swap
+                    $this->exchangeConverter
                 );
             }
         }
