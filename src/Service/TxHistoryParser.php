@@ -10,6 +10,7 @@ use App\Service\FileParser\FileParserInterface;
 use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Money;
+use Money\MoneyParser;
 
 class TxHistoryParser
 {
@@ -20,26 +21,33 @@ class TxHistoryParser
     private const ROW_OFFSET_AMOUNT = 4;
     private const ROW_OFFSET_CURRENCY = 5;
 
-    public function __construct(FileParserInterface $fileParser)
-    {
+    private MoneyParser $moneyParser;
+
+    public function __construct(
+        FileParserInterface $fileParser,
+        MoneyParser $moneyParser
+    ) {
         $this->fileParser = $fileParser;
+        $this->moneyParser = $moneyParser;
     }
 
     public function getTransactionsHistory(string $transactionsfilename)
     {
         $rows = $this->fileParser->parse($transactionsfilename);
         $history = new TransactionsHistory();
-        $isoCurrencies = new ISOCurrencies();
         foreach ($rows as $row) {
-            $currency = new Currency($row[self::ROW_OFFSET_CURRENCY]);
-            $currencyScale = (10 ** $isoCurrencies->subunitFor($currency));
             $history->add(
                 (new Transaction())
                     ->setDate(new \DateTimeImmutable($row[self::ROW_OFFSET_DATE]))
                     ->setClientId((int) $row[self::ROW_OFFSET_CLIENT_ID])
                     ->setClientType($row[self::ROW_OFFSET_CLIENT_TYPE])
                     ->setType($row[self::ROW_OFFSET_TRANSACTION_TYPE])
-                    ->setValue(new Money($row[self::ROW_OFFSET_AMOUNT] * $currencyScale, $currency))
+                    ->setValue(
+                        $this->moneyParser->parse(
+                            $row[self::ROW_OFFSET_AMOUNT],
+                            new Currency($row[self::ROW_OFFSET_CURRENCY])
+                        )
+                    )
             );
         }
 
