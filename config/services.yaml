@@ -36,8 +36,12 @@ services:
     Money\MoneyParser:
         alias: 'Money\Parser\DecimalMoneyParser'
 
+    Money\MoneyFormatter:
+        alias: 'Money\Formatter\DecimalMoneyFormatter'
+
     Money\Parser\DecimalMoneyParser: ~
     Money\Currencies\ISOCurrencies: ~
+    Money\Formatter\DecimalMoneyFormatter: ~
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -4,7 +4,7 @@ namespace App\Command;
 
 use App\Service\TxFeeCalculator;
 use App\Service\TxHistoryParser;
-use Money\Currencies\ISOCurrencies;
+use Money\MoneyFormatter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,14 +14,19 @@ class RateCalcCommand extends Command
 {
     protected static $defaultName = 'rate:calc';
     protected static $defaultDescription = 'Calculate commission rate for transactions in CSV';
-    private $txHistoryParser;
-    private $txFeeCalculator;
+    private TxHistoryParser $txHistoryParser;
+    private TxFeeCalculator $txFeeCalculator;
+    private MoneyFormatter $moneyFormatter;
 
-    public function __construct(TxHistoryParser $txHistoryParser, TxFeeCalculator $txFeeCalculator)
-    {
+    public function __construct(
+        TxHistoryParser $txHistoryParser,
+        TxFeeCalculator $txFeeCalculator,
+        MoneyFormatter $moneyFormatter
+    ) {
         parent::__construct();
         $this->txHistoryParser = $txHistoryParser;
         $this->txFeeCalculator = $txFeeCalculator;
+        $this->moneyFormatter = $moneyFormatter;
     }
 
     protected function configure()
@@ -38,15 +43,9 @@ class RateCalcCommand extends Command
         $fileName = $input->getArgument('transactions_file');
         $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
         $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);
-        $isoCurrencies = new ISOCurrencies();
         foreach ($transactionsHistory as $transaction) {
             if ($transaction->getFee()) {
-                $feeScale = $isoCurrencies->subunitFor($transaction->getFee()->getCurrency());
-                $fee = $transaction->getFee()->getAmount() / (10 ** $feeScale);
-                $outputFormat = '%.' . $feeScale . 'F';
-//                var_dump($fee);
-//                var_dump($outputFormat);
-                $output->writeln(sprintf($outputFormat, $fee));
+                $output->writeln($this->moneyFormatter->format($transaction->getFee()));
             } else {
                 $output->writeln('undefined');
             }

@@ -7,9 +7,7 @@ namespace App\Service;
 use App\Model\Transaction;
 use App\Model\TransactionsHistory;
 use App\Service\FileParser\FileParserInterface;
-use Money\Currencies\ISOCurrencies;
 use Money\Currency;
-use Money\Money;
 use Money\MoneyParser;
 
 class TxHistoryParser
