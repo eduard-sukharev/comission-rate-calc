@@ -11,7 +11,7 @@ class TransactionsHistory implements \IteratorAggregate
     /**
      * @var Transaction[]
      */
-    private $transactions;
+    private $transactions = [];
 
     /**
      * @return Transaction[]
@@ -43,6 +43,17 @@ class TransactionsHistory implements \IteratorAggregate
         $history = new self();
         foreach ($this->transactions as $tx) {
             if ($tx->getDate()->getTimestamp() < $dateTime->getTimestamp()) {
+                $history->add($tx);
+            }
+        }
+        return $history;
+    }
+
+    public function getTransactionsForClient(int $clientId): self
+    {
+        $history = new self();
+        foreach ($this->transactions as $tx) {
+            if ($tx->getClientId() === $clientId) {
                 $history->add($tx);
             }
         }

@@ -23,7 +23,10 @@ class RateCalcCommandTest extends KernelTestCase
     protected function setUp(): void
     {
         $kernel = static::createKernel();
+        $kernel->boot();
         $application = new Application($kernel);
+//        $swap = $kernel->getContainer()->get('florianv_swap.swap');
+//        var_dump($swap);
 
         $this->file = tmpfile();
         $this->command = $application->find('rate:calc');
@@ -75,7 +78,6 @@ class RateCalcCommandTest extends KernelTestCase
             '8612',
         ];
         $actualLines = array_filter($this->splitByLines($output), fn($line) => $line !== '');
-        var_dump($actualLines);
         self::assertCount(count($expectedLines), $actualLines);
         foreach ($actualLines as $i => $actualLine) {
             echo $actualLine . PHP_EOL;

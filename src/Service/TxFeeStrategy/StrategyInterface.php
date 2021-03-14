@@ -13,7 +13,7 @@ interface StrategyInterface
     /**
      * @param Transaction $tx Transaction to calculate fee for
      * @param TransactionsHistory $txHistory History of transactions at least up to transaction of interest
-     * @return Money
+     * @return ?Money Fee value, if any
      */
-    public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): Money;
+    public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): ?Money;
 }

@@ -7,6 +7,7 @@ namespace App\Service;
 use App\Model\Transaction;
 use App\Model\TransactionsHistory;
 use App\Service\FileParser\FileParserInterface;
+use Money\Currencies\ISOCurrencies;
 use Money\Currency;
 use Money\Money;
 
@@ -28,14 +29,17 @@ class TxHistoryParser
     {
         $rows = $this->fileParser->parse($transactionsfilename);
         $history = new TransactionsHistory();
+        $isoCurrencies = new ISOCurrencies();
         foreach ($rows as $row) {
+            $currency = new Currency($row[self::ROW_OFFSET_CURRENCY]);
+            $currencyScale = (10 ** $isoCurrencies->subunitFor($currency));
             $history->add(
                 (new Transaction())
                     ->setDate(new \DateTimeImmutable($row[self::ROW_OFFSET_DATE]))
                     ->setClientId((int) $row[self::ROW_OFFSET_CLIENT_ID])
                     ->setClientType($row[self::ROW_OFFSET_CLIENT_TYPE])
                     ->setType($row[self::ROW_OFFSET_TRANSACTION_TYPE])
-                    ->setValue(new Money($row[self::ROW_OFFSET_AMOUNT], new Currency($row[self::ROW_OFFSET_CURRENCY])))
+                    ->setValue(new Money($row[self::ROW_OFFSET_AMOUNT] * $currencyScale, $currency))
             );
         }
 

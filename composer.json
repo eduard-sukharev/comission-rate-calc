@@ -9,6 +9,7 @@
         "ext-iconv": "*",
         "better/nanoid": "^0.0.1",
         "florianv/swap-bundle": "^5.1",
+        "http-interop/http-factory-guzzle": "^1.0",
         "mockery/mockery": "^1.4",
         "moneyphp/money": "^3.3",
         "php-http/guzzle6-adapter": "^2.0",

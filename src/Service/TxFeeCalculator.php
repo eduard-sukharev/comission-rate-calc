@@ -9,10 +9,17 @@ use App\Service\TxFeeStrategy\FeeStrategyFactory;
 
 class TxFeeCalculator
 {
+    private FeeStrategyFactory $strategyFactory;
+
+    public function __construct(FeeStrategyFactory $strategyFactory)
+    {
+        $this->strategyFactory = $strategyFactory;
+    }
+
     public function calculateTxFees(TransactionsHistory $history): TransactionsHistory
     {
         foreach ($history as $tx) {
-            $tx->setFee(FeeStrategyFactory::createStrategy($tx)->calculateFee($tx, $history));
+            $tx->setFee($this->strategyFactory->createStrategy($tx)->calculateFee($tx, $history));
         }
 
         return $history;

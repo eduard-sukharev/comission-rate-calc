@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Service\TxFeeCalculator;
 use App\Service\TxHistoryParser;
+use Money\Currencies\ISOCurrencies;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,15 +34,22 @@ class RateCalcCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        echo PHP_EOL;
         $fileName = $input->getArgument('transactions_file');
         $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
         $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);
+        $isoCurrencies = new ISOCurrencies();
         foreach ($transactionsHistory as $transaction) {
-            $output->writeln(
-                $transaction->getFee()
-                    ? ($transaction->getFee()->getAmount() ? sprintf('%.2F', $transaction->getFee()->getAmount()) : '0')
-                    : 'undefined'
-            );
+            if ($transaction->getFee()) {
+                $feeScale = $isoCurrencies->subunitFor($transaction->getFee()->getCurrency());
+                $fee = $transaction->getFee()->getAmount() / (10 ** $feeScale);
+                $outputFormat = '%.' . $feeScale . 'F';
+//                var_dump($fee);
+//                var_dump($outputFormat);
+                $output->writeln(sprintf($outputFormat, $fee));
+            } else {
+                $output->writeln('undefined');
+            }
         }
 
         return Command::SUCCESS;

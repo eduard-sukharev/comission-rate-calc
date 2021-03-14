@@ -90,7 +90,7 @@ class Transaction
         return $this->fee;
     }
 
-    public function setFee(Money $fee): self
+    public function setFee(?Money $fee): self
     {
         $this->fee = $fee;
         return $this;
