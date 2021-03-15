@@ -22,7 +22,7 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
         int $freeWithdrawals,
         HistoryConverter $converter
     ) {
-        $this->feeRate = $feePercent;
+        $this->feeRate = $feePercent / 100;
         $this->freeThreshold = $freeThreshold;
         $this->freeWithdrawals = $freeWithdrawals;
         $this->exchangeConverter = $converter;
@@ -53,13 +53,13 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
         // No free withdrawals left
         if ($this->freeWithdrawals <= 0) {
             echo 'No free withdrawals left' . PHP_EOL;
-            return $tx->getValue()->multiply($this->feeRate / 100);
+            return $tx->getValue()->multiply($this->feeRate);
         }
         // Threshold not reached
         if (!$this->freeThreshold->isPositive()) {
             // threshold exceeded, everything is subject to fees
 //        echo 'threshold exceeded, everything is subject to fees' . PHP_EOL;
-            return $tx->getValue()->multiply($this->feeRate / 100);
+            return $tx->getValue()->multiply($this->feeRate);
         }
 
         echo 'Threshold not reached' . PHP_EOL;
@@ -67,27 +67,26 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
         if (!$this->freeThreshold->isSameCurrency($txValue)) {
             $txValue = $this->exchangeConverter->convert($txValue, $this->freeThreshold->getCurrency(), $tx->getDate());
         }
-        $txThresholdExceeds = $txValue->subtract($this->freeThreshold);
 
-        // Transaction value less than leftover threshold
-        if (!$txThresholdExceeds->isPositive()) {
+        if ($txValue->lessThanOrEqual($this->freeThreshold)) {
             echo 'Transaction value less than leftover threshold' . PHP_EOL;
             return new Money(0, $tx->getValue()->getCurrency());
         }
 
+        $txOverdraft = $txValue->subtract($this->freeThreshold);
         // Threshold Exceeds in original tx currency
-        if (!$this->freeThreshold->isSameCurrency($txValue)) {
-            echo 'Threshold Exceeds in original tx currency' . PHP_EOL;
-            $txThresholdExceeds = $this->exchangeConverter->convert(
-                $txThresholdExceeds,
+        if (!$txOverdraft->isSameCurrency($tx->getValue())) {
+            echo 'Overdraft not in original tx currency' . PHP_EOL;
+            $txOverdraft = $this->exchangeConverter->convert(
+                $txOverdraft,
                 $tx->getValue()->getCurrency(),
                 $tx->getDate()
             );
         }
 
-        echo 'Fee on Threshold exceeds: ' . $txThresholdExceeds->getAmount()
-            . ' ' . $txThresholdExceeds->getCurrency()->getCode() . PHP_EOL;
-        return $txThresholdExceeds->multiply($this->feeRate / 100);
+        echo 'Fee on Threshold exceeds: ' . $txOverdraft->getAmount()
+            . ' ' . $txOverdraft->getCurrency()->getCode() . PHP_EOL;
+        return $txOverdraft->multiply($this->feeRate);
     }
 
     public function isSupported(Transaction $tx): bool

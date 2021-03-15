@@ -175,6 +175,9 @@
     "ralouphie/getallheaders": {
         "version": "3.0.3"
     },
+    "roave/security-advisories": {
+        "version": "dev-master"
+    },
     "sebastian/cli-parser": {
         "version": "1.0.1"
     },

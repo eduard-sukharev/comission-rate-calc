@@ -39,7 +39,6 @@ class RateCalcCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        echo PHP_EOL;
         $fileName = $input->getArgument('transactions_file');
         $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
         $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);

@@ -8,6 +8,6 @@ class CsvFileParser implements FileParserInterface
 {
     public function parse(string $filename): array
     {
-        return array_map('str_getcsv', file($filename));
+        return array_filter(array_map('str_getcsv', file($filename)), fn($line) => count($line) > 1);
     }
 }
