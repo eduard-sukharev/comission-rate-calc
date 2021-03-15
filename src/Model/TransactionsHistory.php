@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Service\TxFeeStrategy\StrategyInterface;
 use Better\Nanoid\Client;
 
 class TransactionsHistory implements \IteratorAggregate
@@ -26,7 +27,7 @@ class TransactionsHistory implements \IteratorAggregate
         $this->transactions[(new Client())->produce($size = 32)] = $transaction;
     }
 
-    public function getSameWeekTransactions(\DateTimeImmutable $dateTime): self
+    public function filterBySameWeek(\DateTimeImmutable $dateTime): self
     {
         $history = new self();
         $mondayTimestamp = strtotime('monday this week', $dateTime->getTimestamp());
@@ -38,7 +39,7 @@ class TransactionsHistory implements \IteratorAggregate
         return $history;
     }
 
-    public function getTransactionsUpToDate(\DateTimeImmutable $dateTime): self
+    public function filterUpToDate(\DateTimeImmutable $dateTime): self
     {
         $history = new self();
         foreach ($this->transactions as $tx) {
@@ -49,11 +50,22 @@ class TransactionsHistory implements \IteratorAggregate
         return $history;
     }
 
-    public function getTransactionsForClient(int $clientId): self
+    public function filterByClient(int $clientId): self
     {
         $history = new self();
         foreach ($this->transactions as $tx) {
             if ($tx->getClientId() === $clientId) {
+                $history->add($tx);
+            }
+        }
+        return $history;
+    }
+
+    public function filterByFeeStrategySupport(StrategyInterface $feeStrategy)
+    {
+        $history = new self();
+        foreach ($this->transactions as $tx) {
+            if ($feeStrategy->isSupported($tx)) {
                 $history->add($tx);
             }
         }

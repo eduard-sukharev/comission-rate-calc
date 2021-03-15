@@ -8,7 +8,7 @@ use App\Model\Transaction;
 use App\Model\TransactionsHistory;
 use Money\Money;
 
-class FixedFeeStrategy implements StrategyInterface
+abstract class FixedFeeStrategy implements StrategyInterface
 {
     private float $feeRate;
 

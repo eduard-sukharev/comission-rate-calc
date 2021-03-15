@@ -6,22 +6,26 @@ namespace App\Service\TxFeeStrategy;
 
 use App\Model\Transaction;
 use App\Model\TransactionsHistory;
-use App\Service\ExchangeConverter;
+use App\Service\HistoryConverter;
 use Money\Money;
 
-class WeeklyThresholdFeeStrategy implements StrategyInterface
+abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
 {
     private float $feeRate;
     private Money $freeThreshold;
     private int $freeWithdrawals;
-    private ExchangeConverter $exchangeConverter;
+    private HistoryConverter $exchangeConverter;
 
-    public function __construct(float $feePercent, Money $freeThreshold, int $freeWithdrawals, ExchangeConverter $swap)
-    {
+    public function __construct(
+        float $feePercent,
+        Money $freeThreshold,
+        int $freeWithdrawals,
+        HistoryConverter $converter
+    ) {
         $this->feeRate = $feePercent;
         $this->freeThreshold = $freeThreshold;
         $this->freeWithdrawals = $freeWithdrawals;
-        $this->exchangeConverter = $swap;
+        $this->exchangeConverter = $converter;
     }
 
     /**
@@ -29,9 +33,10 @@ class WeeklyThresholdFeeStrategy implements StrategyInterface
      */
     public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): ?Money
     {
-        $previousTxsSameWeek = $txHistory->getSameWeekTransactions($tx->getDate())
-            ->getTransactionsUpToDate($tx->getDate())
-            ->getTransactionsForClient($tx->getClientId());
+        $previousTxsSameWeek = $txHistory->filterBySameWeek($tx->getDate())
+            ->filterUpToDate($tx->getDate())
+            ->filterByFeeStrategySupport($this)
+            ->filterByClient($tx->getClientId());
         foreach ($previousTxsSameWeek as $prevTx) {
             $prevTxValue = $prevTx->getValue();
             if (!$this->freeThreshold->isSameCurrency($prevTxValue)) {
@@ -83,5 +88,10 @@ class WeeklyThresholdFeeStrategy implements StrategyInterface
         echo 'Fee on Threshold exceeds: ' . $txThresholdExceeds->getAmount()
             . ' ' . $txThresholdExceeds->getCurrency()->getCode() . PHP_EOL;
         return $txThresholdExceeds->multiply($this->feeRate / 100);
+    }
+
+    public function isSupported(Transaction $tx): bool
+    {
+        return $tx->isWithdraw() && $tx->isClientPrivate();
     }
 }

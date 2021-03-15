@@ -16,4 +16,6 @@ interface StrategyInterface
      * @return ?Money Fee value, if any
      */
     public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): ?Money;
+
+    public function isSupported(Transaction $tx): bool;
 }
