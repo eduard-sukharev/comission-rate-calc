@@ -51,12 +51,12 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
         }
         // No free withdrawals left
         if ($this->freeWithdrawals <= 0) {
-            return $tx->getValue()->multiply($this->feeRate);
+            return $tx->getValue()->multiply($this->feeRate, Money::ROUND_UP);
         }
         // Threshold not reached
         if (!$this->freeThreshold->isPositive()) {
             // threshold exceeded, everything is subject to fees
-            return $tx->getValue()->multiply($this->feeRate);
+            return $tx->getValue()->multiply($this->feeRate, Money::ROUND_UP);
         }
 
         $txValue = $tx->getValue();
@@ -78,7 +78,7 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
             );
         }
 
-        return $txOverdraft->multiply($this->feeRate);
+        return $txOverdraft->multiply($this->feeRate, Money::ROUND_UP);
     }
 
     public function isSupported(Transaction $tx): bool
