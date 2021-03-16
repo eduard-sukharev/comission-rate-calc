@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Service\TxFeeCalculator;
 use App\Service\TxHistoryParser;
 use Money\MoneyFormatter;
+use Symfony\Bundle\MakerBundle\ConsoleStyle;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,14 +41,20 @@ class RateCalcCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $fileName = $input->getArgument('transactions_file');
-        $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
-        $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);
-        foreach ($transactionsHistory as $transaction) {
-            if ($transaction->getFee()) {
-                $output->writeln($this->moneyFormatter->format($transaction->getFee()));
-            } else {
-                $output->writeln('undefined');
+        try {
+            $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
+            $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);
+            foreach ($transactionsHistory as $transaction) {
+                if ($transaction->getFee()) {
+                    $output->writeln($this->moneyFormatter->format($transaction->getFee()));
+                } else {
+                    $output->writeln('undefined');
+                }
             }
+        } catch (\Throwable $e) {
+            $style = new ConsoleStyle($input, $output);
+            $style->error('Something went wrong');
+            $style->caution($e->getMessage());
         }
 
         return Command::SUCCESS;
