@@ -30,8 +30,10 @@ class TransactionsHistory implements \IteratorAggregate
     {
         $history = new self();
         $mondayTimestamp = strtotime('monday this week', $dateTime->getTimestamp());
+        $nextMondayTimestamp = strtotime('monday next week', $dateTime->getTimestamp());
         foreach ($this->transactions as $tx) {
-            if ($tx->getDate()->getTimestamp() > $mondayTimestamp) {
+            $txTimestamp = $tx->getDate()->getTimestamp();
+            if ($txTimestamp > $mondayTimestamp && $txTimestamp < $nextMondayTimestamp) {
                 $history->add($tx);
             }
         }
@@ -61,7 +63,7 @@ class TransactionsHistory implements \IteratorAggregate
         return $history;
     }
 
-    public function filterByFeeStrategySupport(StrategyInterface $feeStrategy)
+    public function filterByFeeStrategySupport(StrategyInterface $feeStrategy): self
     {
         $history = new self();
         foreach ($this->transactions as $tx) {
