@@ -8,7 +8,7 @@ interface FileParserInterface
 {
     /**
      * @param $filename
-     * @return array[] Content rows, each represented as array of parsed values
+     * @return \Generator Content rows generator
      */
-    public function parse(string $filename): array;
+    public function getLines(string $filename): \Generator;
 }

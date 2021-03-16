@@ -6,18 +6,23 @@ namespace App\Service\FileParser;
 
 class CsvFileParser implements FileParserInterface
 {
-    public function parse(string $filename): array
-    {
-        $csvLines = [];
-        foreach ($this->getLines($filename) as $line) {
-            $csvLines[] = str_getcsv($line);
-        }
+    /**
+     * @var FileParser
+     */
+    private FileParser $fileParser;
 
-        return array_filter($csvLines, fn ($line) => count($line) > 1);
+    public function __construct(FileParser $fileParser)
+    {
+        $this->fileParser = $fileParser;
     }
 
-    private function getLines(string $filename): array
+    public function getLines(string $filename): \Generator
     {
-        return file($filename);
+        foreach ($this->fileParser->getLines($filename) as $line) {
+            $csvLine = str_getcsv($line);
+            if (count($csvLine) > 1) {
+                yield $csvLine;
+            }
+        }
     }
 }

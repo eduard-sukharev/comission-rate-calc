@@ -27,6 +27,9 @@ services:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
 
+    App\Service\FileParser\FileParserInterface:
+        alias: 'App\Service\FileParser\CsvFileParser'
+
     Swap\Swap:
         alias: 'florianv_swap.swap'
 

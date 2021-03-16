@@ -31,9 +31,8 @@ class TxHistoryParser
 
     public function getTransactionsHistory(string $transactionsfilename)
     {
-        $rows = $this->fileParser->parse($transactionsfilename);
         $history = new TransactionsHistory();
-        foreach ($rows as $row) {
+        foreach ($this->fileParser->getLines($transactionsfilename) as $row) {
             $history->add(
                 (new Transaction())
                     ->setDate(new \DateTimeImmutable($row[self::ROW_OFFSET_DATE]))
