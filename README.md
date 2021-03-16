@@ -11,9 +11,24 @@ Operations are given in a CSV file. In each line of the file the following data 
  - operation amount (for example `2.12` or `3`)
  - operation currency, one of `EUR`, `USD`, `JPY`
 
-## Running
+## Installation
 
 Project requires PHP 7.4 with bcmath extension.
+
+### Local interpreter
+
+```
+composer install
+```
+
+### Docker
+
+Building and installing dependencies done with `-r` option of `run.sh` script (which also runs actual console command):
+```
+./run.sh -r
+```
+
+## Running
 
 ### Local interpreter
 To run actual script:
@@ -29,7 +44,6 @@ php ./vendor/bin/phpunit
 ```
 
 ### Docker
-To run in docker simply call:
 
 ```
 ./run.sh
@@ -40,4 +54,9 @@ You may pass input CSV file path as an argument with `-i` option (by default scr
 To run tests:
 ```
 ./run.sh -t
+```
+
+To run code or tests in [debug mode](https://xdebug.org/docs/step_debug#activate_debugger) add `-d`:
+```
+./run.sh -d
 ```
