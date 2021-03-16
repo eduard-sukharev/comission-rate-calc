@@ -3,6 +3,7 @@
 INPUT_FILE='input.csv'
 RECREATE=false
 RUN_TESTS=false
+DEBUG=''
 
 # Runs a local dev environment
 if ! docker ps -q &> /dev/null
@@ -11,16 +12,18 @@ then
     exit 1
 fi
 
-while getopts "i:rht" option
+while getopts "i:rhtd" option
     do
         case "${option}" in
             i) INPUT_FILE=${OPTARG};;
             t) RUN_TESTS=true;;
             r) RECREATE=true;;
+            d) DEBUG='-e XDEBUG_SESSION=1';;
             h) echo "Helper script to run app in local docker environment."
             echo "Options:"
             echo "    -r Rebuild containers"
             echo "    -t Run tests"
+            echo "    -d Run with debugger"
             echo "    -i Input file (default: input.csv)"
             exit 0;
             ;;
@@ -35,8 +38,8 @@ fi
 
 if [ ${RUN_TESTS} = false ]
 then
-    docker-compose run -e XDEBUG_SESSION=1 php bin/console rate:calc ${INPUT_FILE}
+    docker-compose run ${DEBUG} php bin/console rate:calc ${INPUT_FILE}
 else
-    docker-compose run -e XDEBUG_SESSION=1 php vendor/bin/phpunit
+    docker-compose run ${DEBUG} php vendor/bin/phpunit
 fi
 

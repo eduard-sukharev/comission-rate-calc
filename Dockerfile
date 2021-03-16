@@ -6,7 +6,6 @@ RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 RUN echo "xdebug.mode=develop,debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "xdebug.client_host=172.17.0.1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo "done"
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
