@@ -42,6 +42,7 @@ class RateCalcCommand extends Command
     {
         $fileName = $input->getArgument('transactions_file');
         try {
+            // TODO: refactor overall tx history logic to allow large files handling
             $transactionsHistory = $this->txHistoryParser->getTransactionsHistory($fileName);
             $transactionsHistory = $this->txFeeCalculator->calculateTxFees($transactionsHistory);
             foreach ($transactionsHistory as $transaction) {
