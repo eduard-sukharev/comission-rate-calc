@@ -49,34 +49,28 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
             $this->freeThreshold = $this->freeThreshold->subtract($prevTxValue);
             $this->freeWithdrawals--;
         }
-        echo 'TX: ' . json_encode($tx->getValue()) . PHP_EOL;
         // No free withdrawals left
         if ($this->freeWithdrawals <= 0) {
-            echo 'No free withdrawals left' . PHP_EOL;
             return $tx->getValue()->multiply($this->feeRate);
         }
         // Threshold not reached
         if (!$this->freeThreshold->isPositive()) {
             // threshold exceeded, everything is subject to fees
-//        echo 'threshold exceeded, everything is subject to fees' . PHP_EOL;
             return $tx->getValue()->multiply($this->feeRate);
         }
 
-        echo 'Threshold not reached' . PHP_EOL;
         $txValue = $tx->getValue();
         if (!$this->freeThreshold->isSameCurrency($txValue)) {
             $txValue = $this->exchangeConverter->convert($txValue, $this->freeThreshold->getCurrency(), $tx->getDate());
         }
 
         if ($txValue->lessThanOrEqual($this->freeThreshold)) {
-            echo 'Transaction value less than leftover threshold' . PHP_EOL;
             return new Money(0, $tx->getValue()->getCurrency());
         }
 
         $txOverdraft = $txValue->subtract($this->freeThreshold);
         // Threshold Exceeds in original tx currency
         if (!$txOverdraft->isSameCurrency($tx->getValue())) {
-            echo 'Overdraft not in original tx currency' . PHP_EOL;
             $txOverdraft = $this->exchangeConverter->convert(
                 $txOverdraft,
                 $tx->getValue()->getCurrency(),
@@ -84,8 +78,6 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
             );
         }
 
-        echo 'Fee on Threshold exceeds: ' . $txOverdraft->getAmount()
-            . ' ' . $txOverdraft->getCurrency()->getCode() . PHP_EOL;
         return $txOverdraft->multiply($this->feeRate);
     }
 

@@ -99,6 +99,7 @@ class RateCalcCommandTest extends KernelTestCase
         $actualLines = array_filter($this->splitByLines($output), fn($line) => $line !== '');
         self::assertCount(count($expectedLines), $actualLines);
         foreach ($actualLines as $i => $actualLine) {
+//            echo $expectedLines[$i] . ' ' . $actualLine . PHP_EOL;
             self::assertEquals($expectedLines[$i], $actualLine);
         }
     }
