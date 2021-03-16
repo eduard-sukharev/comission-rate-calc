@@ -33,42 +33,44 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
      */
     public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): ?Money
     {
+        $freeWithdrawals = $this->freeWithdrawals;
+        $freeThreshold = $this->freeThreshold;
         $previousTxsSameWeek = $txHistory->filterBySameWeek($tx->getDate())
             ->filterAllBeforeTx($tx)
-            ->filterByFeeStrategySupport($this)
-            ->filterByClient($tx->getClientId());
+            ->filterByClient($tx->getClientId())
+            ->filterByFeeStrategySupport($this);
         foreach ($previousTxsSameWeek as $prevTx) {
             $prevTxValue = $prevTx->getValue();
-            if (!$this->freeThreshold->isSameCurrency($prevTxValue)) {
+            if (!$freeThreshold->isSameCurrency($prevTxValue)) {
                 $prevTxValue = $this->exchangeConverter->convert(
                     $prevTxValue,
-                    $this->freeThreshold->getCurrency(),
+                    $freeThreshold->getCurrency(),
                     $prevTx->getDate()
                 );
             }
-            $this->freeThreshold = $this->freeThreshold->subtract($prevTxValue);
-            $this->freeWithdrawals--;
+            $freeThreshold = $freeThreshold->subtract($prevTxValue);
+            $freeWithdrawals--;
         }
         // No free withdrawals left
-        if ($this->freeWithdrawals <= 0) {
+        if ($freeWithdrawals <= 0) {
             return $tx->getValue()->multiply($this->feeRate, Money::ROUND_UP);
         }
         // Threshold not reached
-        if (!$this->freeThreshold->isPositive()) {
+        if (!$freeThreshold->isPositive()) {
             // threshold exceeded, everything is subject to fees
             return $tx->getValue()->multiply($this->feeRate, Money::ROUND_UP);
         }
 
         $txValue = $tx->getValue();
-        if (!$this->freeThreshold->isSameCurrency($txValue)) {
-            $txValue = $this->exchangeConverter->convert($txValue, $this->freeThreshold->getCurrency(), $tx->getDate());
+        if (!$freeThreshold->isSameCurrency($txValue)) {
+            $txValue = $this->exchangeConverter->convert($txValue, $freeThreshold->getCurrency(), $tx->getDate());
         }
 
-        if ($txValue->lessThanOrEqual($this->freeThreshold)) {
+        if ($txValue->lessThanOrEqual($freeThreshold)) {
             return new Money(0, $tx->getValue()->getCurrency());
         }
 
-        $txOverdraft = $txValue->subtract($this->freeThreshold);
+        $txOverdraft = $txValue->subtract($freeThreshold);
         // Threshold Exceeds in original tx currency
         if (!$txOverdraft->isSameCurrency($tx->getValue())) {
             $txOverdraft = $this->exchangeConverter->convert(

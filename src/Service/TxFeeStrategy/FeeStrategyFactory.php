@@ -6,34 +6,36 @@ namespace App\Service\TxFeeStrategy;
 
 use App\Model\Transaction;
 use App\Service\HistoryConverter;
-use Money\Currencies\ISOCurrencies;
-use Money\Currency;
-use Money\Money;
 
 class FeeStrategyFactory
 {
     private HistoryConverter $exchangeConverter;
 
+    /**
+     * @var StrategyInterface[]
+     */
+    private array $strategies;
+
     public function __construct(HistoryConverter $exchangeConverter)
     {
         $this->exchangeConverter = $exchangeConverter;
+
+        $this->strategies = [
+            new DepositFeeStrategy(),
+            new BusinessWithdrawFeeStrategy(),
+            new PrivateWithdrawFeeStrategy($this->exchangeConverter),
+            new NoFeeStrategy(),
+        ];
     }
 
-    public function createStrategy(Transaction $tx)
+    public function createStrategy(Transaction $tx): ?StrategyInterface
     {
-        if ($tx->isDeposit()) {
-            return new DepositFeeStrategy();
-        }
-        if ($tx->isWithdraw()) {
-            if ($tx->isClientBusiness()) {
-                return new BusinessWithdrawFeeStrategy();
-            }
-            if ($tx->isClientPrivate()) {
-                return new PrivateWithdrawFeeStrategy($this->exchangeConverter);
-            }
+        foreach ($this->strategies as $strategy) {
+            if ($strategy->isSupported($tx)) {
+                return $strategy;
+            };
         }
 
-        // No defined rule found, assume no fee
-        return new NoFeeStrategy();
+        return null;
     }
 }

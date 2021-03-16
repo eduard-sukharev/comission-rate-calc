@@ -19,7 +19,9 @@ class TxFeeCalculator
     public function calculateTxFees(TransactionsHistory $history): TransactionsHistory
     {
         foreach ($history as $tx) {
-            $tx->setFee($this->strategyFactory->createStrategy($tx)->calculateFee($tx, $history));
+            if ($strategy = $this->strategyFactory->createStrategy($tx)) {
+                $tx->setFee($strategy->calculateFee($tx, $history));
+            }
         }
 
         return $history;
