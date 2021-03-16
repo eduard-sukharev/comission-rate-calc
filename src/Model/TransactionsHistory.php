@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Service\TxFeeStrategy\StrategyInterface;
-use Better\Nanoid\Client;
 
 class TransactionsHistory implements \IteratorAggregate
 {
@@ -24,7 +23,7 @@ class TransactionsHistory implements \IteratorAggregate
 
     public function add(Transaction $transaction)
     {
-        $this->transactions[(new Client())->produce($size = 32)] = $transaction;
+        $this->transactions[] = $transaction;
     }
 
     public function filterBySameWeek(\DateTimeImmutable $dateTime): self
