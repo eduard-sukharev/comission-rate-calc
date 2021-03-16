@@ -39,13 +39,14 @@ class TransactionsHistory implements \IteratorAggregate
         return $history;
     }
 
-    public function filterUpToDate(\DateTimeImmutable $dateTime): self
+    public function filterAllBeforeTx(Transaction $curTx): self
     {
         $history = new self();
         foreach ($this->transactions as $tx) {
-            if ($tx->getDate()->getTimestamp() < $dateTime->getTimestamp()) {
-                $history->add($tx);
+            if ($curTx === $tx) {
+                return $history;
             }
+            $history->add($tx);
         }
         return $history;
     }

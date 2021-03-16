@@ -34,7 +34,7 @@ abstract class WeeklyThresholdFeeStrategy implements StrategyInterface
     public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): ?Money
     {
         $previousTxsSameWeek = $txHistory->filterBySameWeek($tx->getDate())
-            ->filterUpToDate($tx->getDate())
+            ->filterAllBeforeTx($tx)
             ->filterByFeeStrategySupport($this)
             ->filterByClient($tx->getClientId());
         foreach ($previousTxsSameWeek as $prevTx) {
