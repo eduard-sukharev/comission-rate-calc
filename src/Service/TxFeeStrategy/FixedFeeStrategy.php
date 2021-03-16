@@ -22,6 +22,6 @@ abstract class FixedFeeStrategy implements StrategyInterface
      */
     public function calculateFee(Transaction $tx, TransactionsHistory $txHistory): Money
     {
-        return $tx->getValue()->multiply($this->feeRate / 100);
+        return $tx->getValue()->multiply($this->feeRate / 100, Money::ROUND_UP);
     }
 }
