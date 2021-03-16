@@ -35,7 +35,7 @@ To run in docker simply call:
 ./run.sh
 ```
 
-You may pass input CSV file path as an optional argument (by default script will parse `./input.csv`).
+You may pass input CSV file path as an argument with `-i` option (by default script will parse `./input.csv`).
 
 To run tests:
 ```

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INPUT_FILE=${1:-'input.csv'}
+INPUT_FILE='input.csv'
 RECREATE=false
 RUN_TESTS=false
 
@@ -11,17 +11,17 @@ then
     exit 1
 fi
 
-while getopts "rht" option
+while getopts "i:rht" option
     do
         case "${option}" in
+            i) INPUT_FILE=${OPTARG};;
             t) RUN_TESTS=true;;
             r) RECREATE=true;;
             h) echo "Helper script to run app in local docker environment."
-            echo "Arguments:"
-            echo "    input.csv Input filename to parse"
             echo "Options:"
             echo "    -r Rebuild containers"
             echo "    -t Run tests"
+            echo "    -i Input file (default: input.csv)"
             exit 0;
             ;;
     esac
@@ -35,8 +35,8 @@ fi
 
 if [ ${RUN_TESTS} = false ]
 then
-    docker-compose run php bin/console rate:calc ${INPUT_FILE}
+    docker-compose run -e XDEBUG_SESSION=1 php bin/console rate:calc ${INPUT_FILE}
 else
-    docker-compose run php vendor/bin/phpunit
+    docker-compose run -e XDEBUG_SESSION=1 php vendor/bin/phpunit
 fi
 
