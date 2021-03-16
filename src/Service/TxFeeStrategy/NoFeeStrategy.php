@@ -15,6 +15,6 @@ class NoFeeStrategy extends FixedFeeStrategy
 
     public function isSupported(Transaction $tx): bool
     {
-        return true;
+        return false;
     }
 }

@@ -5,23 +5,29 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\TransactionsHistory;
-use App\Service\TxFeeStrategy\FeeStrategyFactory;
+use App\Service\TxFeeStrategy\DependencyInjection\TxFeeStrategyChain;
+use Money\Money;
 
 class TxFeeCalculator
 {
-    private FeeStrategyFactory $strategyFactory;
+    private TxFeeStrategyChain $feeStrategyChain;
 
-    public function __construct(FeeStrategyFactory $strategyFactory)
+    public function __construct(TxFeeStrategyChain $feeStrategyChain)
     {
-        $this->strategyFactory = $strategyFactory;
+        $this->feeStrategyChain = $feeStrategyChain;
     }
 
     public function calculateTxFees(TransactionsHistory $history): TransactionsHistory
     {
         foreach ($history as $tx) {
-            if ($strategy = $this->strategyFactory->createStrategy($tx)) {
-                $tx->setFee($strategy->calculateFee($tx, $history));
+            $fee = new Money(0, $tx->getValue()->getCurrency());
+            foreach ($this->feeStrategyChain->getStrategy() as $strategy) {
+                if ($strategy->isSupported($tx)) {
+                    $fee = $strategy->calculateFee($tx, $history);
+                    break;
+                }
             }
+            $tx->setFee($fee);
         }
 
         return $history;
